@@ -1,0 +1,47 @@
+/* helium-slate author-level sheet, loaded by hs-layout.uc.js.
+   userChrome.css is a user sheet, and Firefox doesn't apply ::part() from
+   user sheets to its shadow DOM; rules that need ::part() live here. */
+
+/* ---------- url field: Helium's quiet "tune" button ------------------------
+   Firefox's search-engine switcher is a loud pill (engine logo + chevron).
+   Draw a plain tune glyph instead. The engine <img> lives in moz-button's
+   shadow DOM with no part, so it is pushed out of the clipped button box. */
+
+#urlbar .searchmode-switcher {
+  --hs-tune: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='%23bfc8ca' stroke-width='1.4' stroke-linecap='round'%3E%3Cpath d='M2 5h6.2M13.8 5H14M2 11h.2M7.8 11H14'/%3E%3Ccircle cx='11' cy='5' r='2'/%3E%3Ccircle cx='5' cy='11' r='2'/%3E%3C/svg%3E");
+  margin-inline: 2px 0 !important;
+
+  &::part(button) {
+    box-sizing: border-box !important;
+    width: 24px !important;
+    min-width: 24px !important;
+    height: 24px !important;
+    padding: 0 0 0 24px !important;   /* slides the engine icon out of view */
+    justify-content: flex-start !important;
+    overflow: clip !important;
+    border: none !important;
+    border-radius: 6px !important;
+    box-shadow: none !important;
+    background: var(--hs-tune) center / 16px no-repeat transparent !important;
+  }
+
+  &:hover::part(button) {
+    background-color: var(--hs-hover) !important;
+  }
+
+  &[open]::part(button) {
+    background-color: var(--hs-press) !important;
+  }
+
+  .searchmode-switcher-dropmarker,
+  .searchmode-switcher-wordmark {
+    display: none !important;
+  }
+}
+
+/* in search mode (engine chosen) keep Firefox's label so you can see it */
+#urlbar[searchmode] .searchmode-switcher::part(button) {
+  width: auto !important;
+  padding: 0 6px 0 24px !important;
+}
+

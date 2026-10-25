@@ -1,0 +1,502 @@
+/* ==========================================================================
+   helium-slate — userChrome.css for Firefox 158 (classic, non-Nova chrome)
+
+   Helium's palette and density, with Chrome-classic connected tabs:
+   the active tab is cut from the same sheet as the frame around the page,
+   and flares into it with inverted corners.
+
+   Layouts (switch from View > Tab Layout or the toolbar right-click menu;
+   hs-layout.uc.js sets :root[hs-layout]):
+     vertical  tab joins the page on its right
+     compact   Helium's single row: url field, tabs, then toolbar buttons;
+               tab joins the page below it
+     classic   tabs on their own row; tab joins the nav bar below it,
+               like Chrome 2010. Also the fallback when the script is absent.
+
+   Needs about:config  toolkit.legacyUserProfileCustomizations.stylesheets = true
+   ========================================================================== */
+
+:root {
+  /* Helium's palette: Chromium Material "Neutral" scheme from Helium's grey
+     seed #888888 (hue 209.5), dark. Matched pixel-exact against Helium. */
+  --hs-frame:   #182123;  /* primary T12: window chrome, sidebar        */
+  --hs-sheet:   #2e3839;  /* omnibox as Helium paints it (80% over frame):
+                             url field, active tab, ring round page     */
+  --hs-hover:   rgb(46 56 57 / 0.45);  /* Helium: active fill at 45%   */
+  --hs-press:   #3f484a;  /* primary T30                                 */
+  --hs-text:    #e4e2e2;  /* neutral T90                                 */
+  --hs-dim:     #c8c6c6;  /* neutral T80: placeholder, inactive tabs     */
+  --hs-icon:    #bfc8ca;  /* primary T80: toolbar icons                  */
+  --hs-line:    #3f484a;  /* primary T30                                 */
+  --hs-popup:   #222b2d;  /* primary T17: open url dropdown              */
+
+  --hs-radius:  8px;      /* tab + field corners (Helium: 8)         */
+  --hs-flare:   8px;      /* inverted-corner size where tab meets page */
+  --hs-ring:    3px;      /* sheet border around the page            */
+  --hs-row:     26px;     /* tab row height                          */
+  --hs-field:   28px;     /* url field height                        */
+  --hs-bar:     calc(var(--hs-field) + 6px);  /* toolbar / tab row height */
+  --hs-tab-width: 104px;  /* horizontal tab width when there's room
+                            (Helium's own is 206px; this is half) */
+
+  /* feed the palette into Firefox's own tokens */
+  --toolbox-background-color: var(--hs-frame) !important;
+  --toolbox-background-color-inactive: var(--hs-frame) !important;
+  --toolbox-text-color: var(--hs-text) !important;
+  --toolbox-text-color-inactive: var(--hs-dim) !important;
+  --toolbar-background-color: var(--hs-frame) !important;
+  --toolbar-bgcolor: var(--hs-frame) !important;
+  --toolbar-color: var(--hs-text) !important;
+  --toolbar-text-color: var(--hs-text) !important;
+  --toolbar-field-background-color: var(--hs-sheet) !important;
+  --toolbar-field-focus-background-color: var(--hs-sheet) !important;
+  --toolbar-field-text-color: var(--hs-text) !important;
+  --toolbar-field-border-color: transparent !important;
+  --toolbarbutton-icon-fill: var(--hs-icon) !important;
+  --urlbar-icon-fill-opacity: 1 !important;
+  --toolbarbutton-border-radius: 6px !important;
+  --toolbarbutton-hover-background: var(--hs-hover) !important;
+  --toolbarbutton-active-background: var(--hs-press) !important;
+  --toolbarbutton-background-color-hover: var(--hs-hover) !important;
+  --toolbarbutton-background-color-active: var(--hs-press) !important;
+  --sidebar-background-color: var(--hs-frame) !important;
+  --sidebar-text-color: var(--hs-text) !important;
+  --sidebar-border-color: transparent !important;
+  --chrome-content-separator-color: transparent !important;
+  --content-area-shadow: none !important;
+  --tabs-navbar-separator-style: none !important;
+
+  --tab-min-height: var(--hs-row) !important;
+  --tab-margin-block: 1px !important;
+  --tab-border-radius: var(--hs-radius) !important;
+  --tab-background-color: transparent !important;
+  --tab-background-color-hover: var(--hs-hover) !important;
+  --tab-background-color-selected: var(--hs-sheet) !important;
+  --tab-text-color-selected: var(--hs-text) !important;
+  --tab-box-shadow-selected: none !important;
+  --tab-border-color-selected: transparent !important;
+  --tab-border-color: transparent !important;
+  --tab-border-color-hover: transparent !important;
+  --tab-border: 0 none transparent !important;
+}
+
+/* ---------- chrome surfaces ---------------------------------------------- */
+
+#navigator-toolbox,
+#nav-bar,
+#TabsToolbar,
+#titlebar,
+#PersonalToolbar,
+#browser,
+#sidebar-main,
+#sidebar-container,
+#vertical-tabs {
+  background-color: var(--hs-frame) !important;
+  background-image: none !important;
+  color: var(--hs-text) !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+}
+
+#navigator-toolbox {
+  border-bottom: none !important;
+}
+
+/* ---------- nav bar: one tight row ---------------------------------------- */
+
+#nav-bar {
+  min-height: 0 !important;
+  padding-block: 3px !important;
+  --toolbarbutton-inner-padding: 6px;
+  --toolbarbutton-outer-padding: 1px;
+  --urlbar-min-height: var(--hs-field);
+  --urlbar-height: var(--hs-field);
+  --urlbar-container-height: calc(var(--hs-field) + 4px);
+}
+
+#urlbar-container {
+  padding-block: 0 !important;
+  margin-inline: 4px !important;
+}
+
+#urlbar,
+.urlbar-background {
+  --toolbar-field-background-color: var(--hs-sheet);
+}
+
+.urlbar-background {
+  background-color: var(--hs-sheet) !important;
+  border: none !important;
+  border-radius: var(--hs-radius) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+#urlbar[focused] .urlbar-background {
+  outline: 1px solid var(--hs-line) !important;
+}
+
+#urlbar:not([open]) .urlbar-input {
+  color: var(--hs-text) !important;
+}
+
+#urlbar[open] .urlbar-background {
+  background-color: var(--hs-popup) !important;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 0.45) !important;
+}
+
+#identity-box > .identity-box-button,
+#tracking-protection-icon-container,
+#urlbar .urlbar-icon,
+#page-action-buttons > * {
+  border-radius: 5px !important;
+}
+
+/* ---------- the page and its sheet ring ----------------------------------- */
+
+#tabbrowser-tabbox {
+  background-color: var(--hs-sheet) !important;
+  padding: var(--hs-ring) !important;
+}
+
+.browserContainer {
+  outline: none !important;
+  box-shadow: none !important;
+  border-radius: calc(var(--hs-radius) - 2px) !important;
+  overflow: clip !important;
+}
+
+/* ---------- tabs: shared ------------------------------------------------- */
+
+.tabbrowser-tab {
+  color: var(--hs-dim) !important;
+}
+
+.tabbrowser-tab[selected] {
+  color: var(--hs-text) !important;
+}
+
+.tab-label-container:not([selected], [multiselected]) {
+  opacity: 0.85 !important;
+}
+
+.tab-background {
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.tab-background:is([selected], [multiselected]) {
+  background-color: var(--hs-sheet) !important;
+  background-image: none !important;
+}
+
+/* ---------- vertical tabs ------------------------------------------------- */
+
+#tabbrowser-tabs[orient="vertical"] {
+  --hs-gutter: 5px; /* gap between window edge and tab on the left */
+
+  .tabbrowser-tab:not([pinned]),
+  tab-split-view-wrapper .tabbrowser-tab {
+    padding-inline: var(--hs-gutter) 0 !important;
+    position: relative;
+  }
+
+  .tabbrowser-tab:not([pinned]) > .tab-stack > .tab-background {
+    margin-inline: 0 var(--hs-gutter) !important;
+    min-height: var(--hs-row) !important;
+  }
+
+  /* the active tab runs to the page and becomes part of the sheet */
+  .tabbrowser-tab[selected]:not([pinned]) {
+    overflow: visible !important;
+    z-index: 2;
+
+    > .tab-stack > .tab-background {
+      margin-inline-end: 0 !important;
+      border-radius: var(--hs-radius) 0 0 var(--hs-radius) !important;
+      position: relative;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        inset-inline-end: 0;
+        width: var(--hs-flare);
+        height: var(--hs-flare);
+        pointer-events: none;
+      }
+
+      /* inverted corner above */
+      &::before {
+        bottom: 100%;
+        background: radial-gradient(circle at 0 0, transparent calc(var(--hs-flare) - 0.5px), var(--hs-sheet) var(--hs-flare));
+      }
+
+      /* inverted corner below */
+      &::after {
+        top: 100%;
+        background: radial-gradient(circle at 0 100%, transparent calc(var(--hs-flare) - 0.5px), var(--hs-sheet) var(--hs-flare));
+      }
+    }
+  }
+}
+
+#tabbrowser-tabs[orient="vertical"] .tab-content {
+  padding-inline: 8px 4px !important;
+}
+
+/* collapsed launcher: icon squares centred in the strip; the active one
+   still stretches right to meet the page */
+#tabbrowser-tabs[orient="vertical"]:not([expanded]) {
+  .tabbrowser-tab:not([pinned]) {
+    padding-inline: 0 !important;
+
+    > .tab-stack > .tab-background {
+      margin-inline: var(--sidebar-launcher-button-padding-inline, 7px) 0 !important;
+      width: var(--tab-collapsed-background-width) !important;
+    }
+
+    &[selected] > .tab-stack > .tab-background {
+      width: auto !important;
+    }
+
+    .tab-content {
+      padding-inline: 0 !important;
+      margin-inline-start: var(--sidebar-launcher-button-padding-inline, 7px) !important;
+      width: var(--tab-collapsed-background-width) !important;
+      justify-content: center !important;
+    }
+  }
+}
+
+/* pinned tabs in the expanded grid can't reach the page: keep them as pills */
+#tabbrowser-tabs[orient="vertical"] .tabbrowser-tab[pinned] > .tab-stack > .tab-background:is([selected], [multiselected]) {
+  border-radius: var(--hs-radius) !important;
+}
+
+#tabbrowser-tabs[orient="vertical"] #tabs-newtab-button,
+#vertical-tabs-newtab-button {
+  margin-inline: 5px !important;
+}
+
+#tabbrowser-tabs[orient="vertical"]:not([expanded]) #tabs-newtab-button,
+#tabbrowser-tabs[orient="vertical"]:not([expanded]) #vertical-tabs-newtab-button {
+  margin-inline: var(--sidebar-launcher-button-padding-inline, 7px) !important;
+}
+
+/* ---------- horizontal tabs: shared by classic and compact ----------------
+   The active tab runs to the bottom of the tab row and flares into whatever
+   sits below it (nav bar in classic, the page ring in compact). */
+
+#tabbrowser-tabs[orient="horizontal"] {
+  --tab-min-height: var(--hs-row) !important;
+  --tab-max-width: var(--hs-tab-width) !important;
+
+  .tabbrowser-tab {
+    height: var(--hs-bar) !important;
+    padding-inline: 1px !important;
+  }
+
+  .tab-background {
+    margin-block: 4px !important;
+    min-height: 0 !important;
+  }
+
+  /* room inside the scroller so the first tab's left flare isn't clipped */
+  #tabbrowser-arrowscrollbox > :first-child {
+    margin-inline-start: var(--hs-flare) !important;
+  }
+
+  .tabbrowser-tab[selected] {
+    overflow: visible !important;
+    z-index: 2;
+
+    > .tab-stack > .tab-background {
+      margin-block: 3px 0 !important;
+      border-radius: var(--hs-radius) var(--hs-radius) 0 0 !important;
+      position: relative;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        width: var(--hs-flare);
+        height: var(--hs-flare);
+        pointer-events: none;
+      }
+
+      &::before {
+        right: 100%;
+        background: radial-gradient(circle at 0 0, transparent calc(var(--hs-flare) - 0.5px), var(--hs-sheet) var(--hs-flare));
+      }
+
+      &::after {
+        left: 100%;
+        background: radial-gradient(circle at 100% 0, transparent calc(var(--hs-flare) - 0.5px), var(--hs-sheet) var(--hs-flare));
+      }
+    }
+
+    > .tab-stack > .tab-content {
+      margin-block-start: 3px;
+    }
+  }
+}
+
+:root:has(#tabbrowser-tabs[orient="horizontal"]) {
+  #TabsToolbar,
+  #TabsToolbar-customization-target,
+  #tabbrowser-tabs,
+  #tabbrowser-arrowscrollbox,
+  #pinned-tabs-container {
+    min-height: 0 !important;
+    height: var(--hs-bar) !important;
+    --tabstrip-min-height: var(--hs-bar);
+  }
+}
+
+/* ---------- classic: tab row over a nav bar cut from the sheet ------------- */
+
+:root:not([hs-layout="compact"], [hs-layout="vertical"]),
+:root[hs-layout="compact"][customizing] {
+  #nav-bar {
+    background-color: var(--hs-sheet) !important;
+    --toolbarbutton-hover-background: var(--hs-press) !important;
+    --toolbarbutton-background-color-hover: var(--hs-press) !important;
+    --toolbarbutton-active-background: #434e50 !important;
+    --toolbarbutton-background-color-active: #434e50 !important;
+  }
+
+  /* the url field sinks into the sheet instead of sitting on it */
+  #nav-bar .urlbar-background {
+    background-color: var(--hs-frame) !important;
+  }
+
+  #urlbar[open] .urlbar-background {
+    background-color: #141d1f !important;  /* primary T10 */
+  }
+
+  /* the nav bar is already sheet-coloured; no ring needed along the top */
+  #tabbrowser-tabbox {
+    padding-block-start: 0 !important;
+  }
+
+  .browserContainer {
+    border-start-start-radius: 0 !important;
+    border-start-end-radius: 0 !important;
+  }
+}
+
+/* ---------- compact: one row — url field, tabs, toolbar buttons ------------
+   #TabsToolbar is stacked over the nav bar's tab slot (see hs-layout.uc.js),
+   so the nav bar keeps working with Customize Toolbar. */
+
+:root[hs-layout="compact"]:not([customizing]) {
+  --hs-url-width: 350px;  /* Helium compact omnibox */
+
+  #navigator-toolbox {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    position: relative !important;
+  }
+
+  #navigator-toolbox > * {
+    grid-column: 1 !important;
+  }
+
+  #nav-bar {
+    grid-row: 1 !important;
+    height: var(--hs-bar) !important;
+  }
+
+  #TabsToolbar {
+    grid-row: 1 !important;
+    z-index: 2;
+    justify-self: start !important;
+    margin-inline-start: var(--hs-tabs-start, 0px) !important;
+    width: var(--hs-tabs-width, 0px) !important;
+    min-width: 0 !important;
+  }
+
+  #PersonalToolbar { grid-row: 2 !important; }
+  #notifications-toolbar { grid-row: 3 !important; }
+  #toolbar-menubar { grid-row: 4 !important; }
+
+  /* url field: fixed width, like Helium's omnibox */
+  #urlbar-container {
+    flex: 0 1 var(--hs-url-width) !important;
+    width: var(--hs-url-width) !important;
+    min-width: 160px !important;
+  }
+
+  /* the tab slot takes the slack; other flexible spaces close up */
+  #nav-bar toolbarspring {
+    flex: 0 0 0 !important;
+    min-width: 0 !important;
+    width: 0 !important;
+  }
+
+  #nav-bar toolbarspring[hs-tab-slot] {
+    flex: 1 1 0 !important;
+    min-width: 120px !important;
+    max-width: none !important;
+  }
+
+  #nav-bar [hs-tab-push] {
+    margin-inline-start: auto !important;
+  }
+
+  #nav-bar #vertical-spacer {
+    display: none !important;
+  }
+
+  /* macOS window buttons sit at the far left of the row */
+  &:not([inFullscreen]) #nav-bar {
+    padding-inline-start: 72px !important;
+  }
+
+  #TabsToolbar .titlebar-buttonbox-container {
+    position: absolute !important;
+    inset-inline-start: 0 !important;
+    top: 0 !important;
+    height: var(--hs-bar) !important;
+    align-items: center !important;
+  }
+
+  #TabsToolbar .titlebar-spacer {
+    display: none !important;
+  }
+}
+
+/* Helium shows the close button only on hover (and on the active tab) */
+#tabbrowser-tabs[orient="horizontal"] .tabbrowser-tab:not([selected], :hover) .tab-close-button {
+  display: none !important;
+}
+
+/* vertical: buttons Firefox moved from the horizontal tab strip into the
+   nav bar stay out of the toolbar corner (hs-layout.uc.js marks them) */
+:root[hs-layout="vertical"]:not([customizing]) #nav-bar [hs-tabstrip-widget] {
+  display: none !important;
+}
+
+#trust-icon-container,
+#identity-box > .identity-box-button {
+  background-color: transparent !important;
+}
+
+/* ---------- sidebar button: classic only --------------------------------- */
+
+:root:is([hs-layout="compact"], [hs-layout="vertical"]):not([customizing]) #nav-bar #sidebar-button {
+  display: none !important;
+}
+
+/* ---------- dragging a tab: it shrinks so it's easy to steer into groups --- */
+
+.tabbrowser-tab > .tab-stack {
+  transition: scale 140ms ease-out, opacity 140ms ease-out;
+}
+
+.tabbrowser-tab:is([dragtarget], [multiselected-move-together]) > .tab-stack {
+  scale: 0.84;
+  opacity: 0.92;
+}
